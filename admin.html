@@ -1,41 +1,217 @@
-<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Admin - Lux Emerals</title><link rel="stylesheet" href="style.css"></head><body>
-<div class="admin-wrap">
-  <h1>🔐 Pannello Admin</h1>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pannello Admin - Lux Emerals</title>
+  <style>
+    body {
+      background-color: #000;
+      color: gold;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    .card {
+      background: #111;
+      border: 1px solid gold;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    input, button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 80%;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+    input {
+      background: #222;
+      color: white;
+    }
+    button {
+      background: gold;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ffdb4d;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔒 Pannello Admin</h1>
+
+  <!-- Inizializzazione -->
   <div id="init" style="display:none" class="card">
-    <p>Prima configurazione — crea il direttore</p>
-    <input id="initUser" placeholder="Username"><input id="initPass" placeholder="Password"><button onclick="initDirector()">Crea Director</button>
+    <p>Prima configurazione — crea il direttore 👇</p>
+    <input id="initUser" placeholder="Username" />
+    <input id="initPass" type="password" placeholder="Password" />
+    <button onclick="initDirector()">Crea Director</button>
     <p id="initMsg"></p>
   </div>
 
+  <!-- Login -->
   <div id="loginBox" class="card">
-    <input id="loginUser" placeholder="Username"><input id="loginPass" placeholder="Password"><button onclick="login()">Accedi</button><p id="loginMsg"></p>
+    <input id="loginUser" placeholder="Username" />
+    <input id="loginPass" type="password" placeholder="Password" />
+    <button onclick="login()">Accedi</button>
+    <p id="loginMsg"></p>
   </div>
 
+  <!-- Pannello -->
   <div id="panel" style="display:none" class="card">
-    <h2>Benvenuto, <span id="who"></span></h2>
-    <section><h3>Ordini</h3><table><thead><tr><th>ID</th><th>Cliente</th><th>Items</th><th>Tipo</th><th>Totale</th><th>Stato</th><th>Azioni</th></tr></thead><tbody id="ordersT"></tbody></table></section>
-    <section id="directorControls" style="display:none">
-      <h3>Gestione utenti</h3>
-      <input id="newUser" placeholder="username"><input id="newPass" placeholder="password">
-      <input id="directorUser" placeholder="tuo username (director)"><input id="directorPass" placeholder="tuo password (director)"><button onclick="addUser()">Aggiungi utente</button>
-      <div id="usersList"></div>
-      <h3>Webhook Discord</h3>
-      <input id="webhookInput" placeholder="https://discord.com/api/..." style="width:80%"><button onclick="setWebhook()">Imposta webhook</button>
+    <h2>Benvenuto, <span id="who"></span> 👑</h2>
+
+    <section>
+      <h3>📦 Ordini</h3>
+      <table border="1" width="100%" style="color:white">
+        <thead><tr><th>ID</th><th>Cliente</th><th>Items</th><th>Totale</th><th>Stato</th></tr></thead>
+        <tbody id="ordersT"></tbody>
+      </table>
     </section>
+
+    <section id="directorControls" style="display:none">
+      <h3>Gestione Utenti</h3>
+      <input id="newUser" placeholder="Username" />
+      <input id="newPass" placeholder="Password" type="password" />
+      <input id="directorUser" placeholder="Tuo username (director)" />
+      <input id="directorPass" placeholder="Tua password (director)" type="password" />
+      <button onclick="addUser()">Aggiungi Utente</button>
+      <div id="usersList"></div>
+
+      <h3>🔗 Webhook Discord</h3>
+      <input id="webhookInput" placeholder="https://discord.com/api/webhooks/..." />
+      <button onclick="setWebhook()">Imposta Webhook</button>
+    </section>
+
     <button onclick="logout()">Logout</button>
   </div>
-</div>
-<script src="script.js"></script>
-<script>
-async function checkInit(){ const res=await fetch('/api/users'); const users=await res.json(); if(!users||users.length===0){ document.getElementById('init').style.display='block'; document.getElementById('loginBox').style.display='none'; } }
-checkInit();
-async function initDirector(){ const u=document.getElementById('initUser').value; const p=document.getElementById('initPass').value; const res=await fetch('/api/init-director',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}); const data=await res.json(); document.getElementById('initMsg').textContent = data.ok? 'Director creato, effettua il login.' : (data.error||'Errore'); location.reload(); }
-async function login(){ const u=document.getElementById('loginUser').value; const p=document.getElementById('loginPass').value; const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}); const data=await res.json(); if(data.success){ document.getElementById('loginBox').style.display='none'; document.getElementById('panel').style.display='block'; document.getElementById('who').textContent = data.username + ' ('+data.role+')'; sessionStorage.setItem('me', JSON.stringify({ username: data.username, role: data.role })); loadOrders(); if(data.role==='director') document.getElementById('directorControls').style.display='block'; } else { document.getElementById('loginMsg').textContent='Credenziali errate'; } }
-async function loadOrders(){ const res=await fetch('/api/orders'); const list=await res.json(); const t=document.getElementById('ordersT'); t.innerHTML = list.map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${(o.items||[]).map(i=>i.name+' x'+i.qty).join(', ')}</td><td>${o.serviceType||''}</td><td>${o.total||0}</td><td>${o.status}</td><td><button onclick="changeStatus('${o.id}','consegnato')">Consegna</button> <button onclick="changeStatus('${o.id}','annullato')">Annulla</button></td></tr>`).join(''); refreshUsers(); }
-async function changeStatus(id,status){ const me = JSON.parse(sessionStorage.getItem('me')||'null'); if(!me) return alert('Login richiesto'); const directorUsername = me.role==='director'? me.username : prompt('Director username for confirmation'); const directorPassword = prompt('Director password for confirmation'); const res = await fetch('/api/order/'+id+'/status',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({ directorUsername, directorPassword, status })}); const d=await res.json(); if(d.ok) loadOrders(); }
-async function addUser(){ const username=document.getElementById('newUser').value; const password=document.getElementById('newPass').value; const directorUsername=document.getElementById('directorUser').value; const directorPassword=document.getElementById('directorPass').value; const res=await fetch('/api/add-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ username, password, directorUsername, directorPassword })}); const j=await res.json(); alert(j.ok? 'Utente aggiunto' : (j.error||'Errore')); refreshUsers(); }
-async function refreshUsers(){ const res=await fetch('/api/users'); const users=await res.json(); document.getElementById('usersList').innerHTML = users.map(u=>`<div>${u.username} (${u.role}) <button onclick="removeUser('${u.username}')">Rimuovi</button></div>`).join(''); }
-async function removeUser(username){ const directorUsername=document.getElementById('directorUser').value; const directorPassword=document.getElementById('directorPass').value; const res=await fetch('/api/remove-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ username, directorUsername, directorPassword })}); const j=await res.json(); alert(j.ok? 'Rimosso' : (j.error||'Errore')); refreshUsers(); }
-async function setWebhook(){ const webhook = document.getElementById('webhookInput').value; const directorUsername=document.getElementById('directorUser').value; const directorPassword=document.getElementById('directorPass').value; const res = await fetch('/api/set-webhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ webhook, directorUsername, directorPassword })}); const j = await res.json(); alert(j.ok? 'Webhook impostato' : (j.error||'Errore')); }
-function logout(){ sessionStorage.removeItem('me'); location.reload(); }
-</script></body></html>
+
+  <script>
+    async function checkInit() {
+      const res = await fetch('/api/users');
+      const users = await res.json();
+      if (!users || users.length === 0) {
+        document.getElementById('init').style.display = 'block';
+        document.getElementById('loginBox').style.display = 'none';
+      } else {
+        document.getElementById('loginBox').style.display = 'block';
+      }
+    }
+
+    async function initDirector() {
+      const u = document.getElementById('initUser').value;
+      const p = document.getElementById('initPass').value;
+      const res = await fetch('/api/init-director', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ u, p })
+      });
+      document.getElementById('initMsg').textContent = res.ok ? "Direttore creato ✅" : "Errore ❌";
+      checkInit();
+    }
+
+    async function login() {
+      const u = document.getElementById('loginUser').value;
+      const p = document.getElementById('loginPass').value;
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ u, p })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        sessionStorage.setItem('me', JSON.stringify(data.user));
+        location.reload();
+      } else {
+        document.getElementById('loginMsg').textContent = 'Credenziali errate ❌';
+      }
+    }
+
+    async function loadOrders() {
+      const res = await fetch('/api/orders');
+      const list = await res.json();
+      document.getElementById('ordersT').innerHTML = list.map(o =>
+        `<tr><td>${o.id}</td><td>${o.name}</td><td>${o.items}</td><td>${o.total}$</td><td>${o.status}</td></tr>`
+      ).join('');
+    }
+
+    async function addUser() {
+      const username = document.getElementById('newUser').value;
+      const password = document.getElementById('newPass').value;
+      const directorUsername = document.getElementById('directorUser').value;
+      const directorPassword = document.getElementById('directorPass').value;
+      const res = await fetch('/api/add-user', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username, password, directorUsername, directorPassword })
+      });
+      if (res.ok) alert("Utente aggiunto ✅");
+      else alert("Errore ❌");
+      refreshUsers();
+    }
+
+    async function refreshUsers() {
+      const res = await fetch('/api/users');
+      const users = await res.json();
+      document.getElementById('usersList').innerHTML =
+        users.map(u => `<p>${u.username} (${u.role})</p>`).join('');
+    }
+
+    async function setWebhook() {
+      const webhook = document.getElementById('webhookInput').value;
+      const directorUser = document.getElementById('directorUser').value;
+      const directorPass = document.getElementById('directorPass').value;
+      const res = await fetch('/api/set-webhook', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ webhook, directorUser, directorPass })
+      });
+      alert(res.ok ? "Webhook impostato ✅" : "Errore ❌");
+    }
+
+    function logout() {
+      sessionStorage.removeItem('me');
+      location.reload();
+    }
+
+    // 🔐 Creazione automatica dell’admin "Giublo" se non esiste
+    window.addEventListener("load", async () => {
+      const defaultUser = "Giublo";
+      const defaultPass = "giublo808@G";
+      const res = await fetch("/api/users");
+      const users = await res.json();
+      if (!users || users.length === 0) {
+        await fetch("/api/init-director", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ u: defaultUser, p: defaultPass })
+        });
+        console.log("✅ Admin predefinito creato:", defaultUser);
+      }
+      const me = sessionStorage.getItem('me');
+      if (me) {
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('panel').style.display = 'block';
+        const user = JSON.parse(me);
+        document.getElementById('who').textContent = user.username;
+        if (user.role === 'director') {
+          document.getElementById('directorControls').style.display = 'block';
+          await refreshUsers();
+        }
+        await loadOrders();
+      } else {
+        checkInit();
+      }
+    });
+  </script>
+</body>
+</html>
+
