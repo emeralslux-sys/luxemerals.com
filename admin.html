@@ -1,0 +1,41 @@
+<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Admin - Lux Emerals</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="admin-wrap">
+  <h1>🔐 Pannello Admin</h1>
+  <div id="init" style="display:none" class="card">
+    <p>Prima configurazione — crea il direttore</p>
+    <input id="initUser" placeholder="Username"><input id="initPass" placeholder="Password"><button onclick="initDirector()">Crea Director</button>
+    <p id="initMsg"></p>
+  </div>
+
+  <div id="loginBox" class="card">
+    <input id="loginUser" placeholder="Username"><input id="loginPass" placeholder="Password"><button onclick="login()">Accedi</button><p id="loginMsg"></p>
+  </div>
+
+  <div id="panel" style="display:none" class="card">
+    <h2>Benvenuto, <span id="who"></span></h2>
+    <section><h3>Ordini</h3><table><thead><tr><th>ID</th><th>Cliente</th><th>Items</th><th>Tipo</th><th>Totale</th><th>Stato</th><th>Azioni</th></tr></thead><tbody id="ordersT"></tbody></table></section>
+    <section id="directorControls" style="display:none">
+      <h3>Gestione utenti</h3>
+      <input id="newUser" placeholder="username"><input id="newPass" placeholder="password">
+      <input id="directorUser" placeholder="tuo username (director)"><input id="directorPass" placeholder="tuo password (director)"><button onclick="addUser()">Aggiungi utente</button>
+      <div id="usersList"></div>
+      <h3>Webhook Discord</h3>
+      <input id="webhookInput" placeholder="https://discord.com/api/..." style="width:80%"><button onclick="setWebhook()">Imposta webhook</button>
+    </section>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+<script src="script.js"></script>
+<script>
+async function checkInit(){ const res=await fetch('/api/users'); const users=await res.json(); if(!users||users.length===0){ document.getElementById('init').style.display='block'; document.getElementById('loginBox').style.display='none'; } }
+checkInit();
+async function initDirector(){ const u=document.getElementById('initUser').value; const p=document.getElementById('initPass').value; const res=await fetch('/api/init-director',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}); const data=await res.json(); document.getElementById('initMsg').textContent = data.ok? 'Director creato, effettua il login.' : (data.error||'Errore'); location.reload(); }
+async function login(){ const u=document.getElementById('loginUser').value; const p=document.getElementById('loginPass').value; const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}); const data=await res.json(); if(data.success){ document.getElementById('loginBox').style.display='none'; document.getElementById('panel').style.display='block'; document.getElementById('who').textContent = data.username + ' ('+data.role+')'; sessionStorage.setItem('me', JSON.stringify({ username: data.username, role: data.role })); loadOrders(); if(data.role==='director') document.getElementById('directorControls').style.display='block'; } else { document.getElementById('loginMsg').textContent='Credenziali errate'; } }
+async function loadOrders(){ const res=await fetch('/api/orders'); const list=await res.json(); const t=document.getElementById('ordersT'); t.innerHTML = list.map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${(o.items||[]).map(i=>i.name+' x'+i.qty).join(', ')}</td><td>${o.serviceType||''}</td><td>${o.total||0}</td><td>${o.status}</td><td><button onclick="changeStatus('${o.id}','consegnato')">Consegna</button> <button onclick="changeStatus('${o.id}','annullato')">Annulla</button></td></tr>`).join(''); refreshUsers(); }
+async function changeStatus(id,status){ const me = JSON.parse(sessionStorage.getItem('me')||'null'); if(!me) return alert('Login richiesto'); const directorUsername = me.role==='director'? me.username : prompt('Director username for confirmation'); const directorPassword = prompt('Director password for confirmation'); const res = await fetch('/api/order/'+id+'/status',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({ directorUsername, directorPassword, status })}); const d=await res.json(); if(d.ok) loadOrders(); }
+async function addUser(){ const username=document.getElementById('newUser').value; const password=document.getElementById('newPass').value; const directorUsername=document.getElementById('directorUser').value; const directorPassword=document.getElementById('directorPass').value; const res=await fetch('/api/add-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ username, password, directorUsername, directorPassword })}); const j=await res.json(); alert(j.ok? 'Utente aggiunto' : (j.error||'Errore')); refreshUsers(); }
+async function refreshUsers(){ const res=await fetch('/api/users'); const users=await res.json(); document.getElementById('usersList').innerHTML = users.map(u=>`<div>${u.username} (${u.role}) <button onclick="removeUser('${u.username}')">Rimuovi</button></div>`).join(''); }
+async function removeUser(username){ const directorUsername=document.getElementById('directorUser').value; const directorPassword=document.getElementById('directorPass').value; const res=await fetch('/api/remove-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ username, directorUsername, directorPassword })}); const j=await res.json(); alert(j.ok? 'Rimosso' : (j.error||'Errore')); refreshUsers(); }
+async function setWebhook(){ const webhook = document.getElementById('webhookInput').value; const directorUsername=document.getElementById('directorUser').value; const directorPassword=document.getElementById('directorPass').value; const res = await fetch('/api/set-webhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ webhook, directorUsername, directorPassword })}); const j = await res.json(); alert(j.ok? 'Webhook impostato' : (j.error||'Errore')); }
+function logout(){ sessionStorage.removeItem('me'); location.reload(); }
+</script></body></html>
