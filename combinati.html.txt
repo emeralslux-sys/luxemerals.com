@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Combinati - Lux Emerals</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <header>
+    <h1>Lux Emerals</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menù</a>
+      <a href="combinati.html">Combinati</a>
+      <a href="noleggi.html">Noleggi</a>
+      <a href="servizi.html">Servizi</a>
+      <a href="ordina.html">Ordina</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Menù Combinati</h2>
+    <ul>
+      <li>1x1 — 900 $</li>
+      <li>2x2 — 1.400 $</li>
+      <li>5x5 — 3.000 $</li>
+      <li>10x10 — 6.000 $</li>
+      <li>20x20 — 15.000 $</li>
+      <li>50x50 — 40.000 $</li>
+      <li>100x100 — 80.000 $</li>
+      <li>200x200 — 110.000 $</li>
+      <li>300x300 — 160.000 $</li>
+      <li>400x400 — 200.000 $</li>
+      <li>500x500 — 300.000 $</li>
+    </ul>
+  </main>
+</body>
+</html>

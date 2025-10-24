@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menù - Lux Emerals</title>
+  <link rel="stylesheet" href="styles/style.css">
+  <script src="scripts/main.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Lux Emerals</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menù</a>
+      <a href="combinati.html">Combinati</a>
+      <a href="noleggi.html">Noleggi</a>
+      <a href="servizi.html">Servizi</a>
+      <a href="ordina.html">Ordina</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Menù Cibo & Bevande</h2>
+    <div id="menuContainer"></div>
+  </main>
+</body>
+</html>

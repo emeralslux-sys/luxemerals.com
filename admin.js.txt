@@ -1,0 +1,19 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("loginForm");
+  const status = document.getElementById("loginStatus");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+
+    if (user === "Giublo" && pass === "giublo808@G") {
+      status.textContent = "✅ Accesso effettuato!";
+      status.style.color = "lime";
+      window.location.href = "ordina.html";
+    } else {
+      status.textContent = "❌ Credenziali errate.";
+      status.style.color = "red";
+    }
+  });
+});

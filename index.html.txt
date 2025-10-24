@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lux Emerals - Home</title>
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Lux Emerals</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menù</a>
+      <a href="combinati.html">Combinati</a>
+      <a href="noleggi.html">Noleggi</a>
+      <a href="servizi.html">Servizi</a>
+      <a href="ordina.html">Ordina</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Benvenuti al Lux Emerals</h2>
+    <p>Locale di lusso, eventi, privè e cucina raffinata. Aperto 24/7</p>
+  </main>
+
+  <footer>
+    <p>📞 Contatti RP: 553167731 | Lux Emerals © 2025</p>
+  </footer>
+</body>
+</html>

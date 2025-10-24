@@ -1,0 +1,36 @@
+const webhookURL = "https://discord.com/api/webhooks/1430969431462248570/kt8Yc_OlqpRmSur9lSgb_SbhmZNo0FT_7aLfer1Wds1XXAjEwtBMSgOIjnqmubbOifLl";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("orderForm");
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("name").value;
+    const civico = document.getElementById("civico").value;
+    const order = document.getElementById("order").value;
+    const msg = document.getElementById("statusMsg");
+
+    try {
+      const res = await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: `📦 **Nuovo Ordine Lux Emerals**\n👤 Cliente: ${name}\n🏠 Civico: ${civico}\n🛒 Ordine: ${order}`,
+        }),
+      });
+
+      if (res.ok) {
+        msg.textContent = "✅ Ordine inviato con successo!";
+        msg.style.color = "lime";
+        form.reset();
+      } else {
+        msg.textContent = "❌ Errore nell'invio. Riprova.";
+        msg.style.color = "red";
+      }
+    } catch (err) {
+      msg.textContent = "⚠️ Errore di connessione.";
+      msg.style.color = "red";
+    }
+  });
+});

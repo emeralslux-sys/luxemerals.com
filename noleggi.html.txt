@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noleggi - Lux Emerals</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <header>
+    <h1>Lux Emerals</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menù</a>
+      <a href="combinati.html">Combinati</a>
+      <a href="noleggi.html">Noleggi</a>
+      <a href="servizi.html">Servizi</a>
+      <a href="ordina.html">Ordina</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Noleggi</h2>
+    <ul>
+      <li>Limousine Normale - 20 Min = 25k</li>
+      <li>Limousine Luxury - 20 Min = 45k</li>
+      <li>Elicottero - 20 Minuti = 25k</li>
+    </ul>
+  </main>
+</body>
+</html>
